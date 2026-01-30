@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-#include <QButtonGroup>
+#include "worker.h"
+
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QRegularExpression>
 
 namespace {
@@ -31,6 +33,11 @@ MainWindow::MainWindow(Settings& settings, QWidget* parent)
           &MainWindow::on_browse_input_directory);
   connect(ui->browseOutputButton, &QPushButton::clicked, this,
           &MainWindow::on_browse_output_directory);
+
+  connect(ui->startStopButton, &QPushButton::clicked, this,
+          &MainWindow::on_start_stop_clicked);
+  connect(ui->clearLogButton, &QPushButton::clicked, ui->logTextEdit,
+          &QPlainTextEdit::clear);
 
   connect_ui_to_settings();
 }
@@ -153,6 +160,75 @@ void MainWindow::on_browse_output_directory() {
   file_manager_->set_output_directory(directory);
 }
 
+void MainWindow::on_start_stop_clicked() {
+  if (worker_thread_ && worker_thread_->isRunning()) {
+    emit stop_requested();
+    return;
+  }
+
+  worker_thread_ = new QThread(this);
+  worker_ = new Worker(file_manager_.data(), settings_, nullptr);
+  worker_->moveToThread(worker_thread_);
+
+  connect(worker_thread_, &QThread::started, worker_, &Worker::process);
+  connect(worker_, &Worker::finished, worker_thread_, &QThread::quit);
+  connect(worker_, &Worker::finished, this, &MainWindow::on_worker_finished);
+  connect(worker_, &Worker::progress_overall, this,
+          &MainWindow::on_worker_progress_overall);
+  connect(worker_, &Worker::progress_file, this,
+          &MainWindow::on_worker_progress_file);
+  connect(worker_, &Worker::status_message, this,
+          &MainWindow::on_worker_status_message);
+  connect(worker_, &Worker::error_occurred, this,
+          &MainWindow::on_worker_error);
+  connect(this, &MainWindow::stop_requested, worker_, &Worker::request_cancel,
+          Qt::QueuedConnection);
+
+  ui->startStopButton->setText(tr("Стоп"));
+  ui->currentFileProgressBar->setValue(0);
+  ui->statusStatusLabel->setText(tr("Обработка..."));
+  worker_thread_->start();
+}
+
+void MainWindow::on_worker_finished() {
+  if (worker_) {
+    worker_->deleteLater();
+    worker_ = nullptr;
+  }
+  if (worker_thread_) {
+    worker_thread_->quit();
+    worker_thread_->wait();
+    worker_thread_->deleteLater();
+    worker_thread_ = nullptr;
+  }
+  ui->startStopButton->setText(tr("Старт/Стоп"));
+  ui->statusStatusLabel->setText(tr("Готово"));
+}
+
+void MainWindow::on_worker_progress_overall(int percent) {
+  ui->currentFileProgressBar->setValue(percent);
+}
+
+void MainWindow::on_worker_progress_file(const QString& file_name,
+                                         int percent) {
+  Q_UNUSED(percent);
+  ui->currentFileStatusLabel->setText(file_name);
+}
+
+void MainWindow::on_worker_status_message(const QString& message) {
+  ui->logTextEdit->appendPlainText(message);
+  ui->statusStatusLabel->setText(message);
+}
+
+void MainWindow::on_worker_error(const QString& message) {
+  ui->logTextEdit->appendPlainText(message);
+  ui->statusStatusLabel->setText(tr("Ошибка"));
+}
+
 MainWindow::~MainWindow() {
+  if (worker_thread_ && worker_thread_->isRunning()) {
+    emit stop_requested();
+    worker_thread_->wait(3000);
+  }
   delete ui;
 }

@@ -21,6 +21,11 @@ class FileManager : public QObject {
   bool is_valid() const;
   QStringList input_files();
 
+  enum class OutputPathMode { kOverwrite, kAppendCounter };
+  QString get_output_path_for(const QString& input_file_path,
+                              const QString& output_directory,
+                              OutputPathMode path_mode) const;
+
  signals:
   void error_occurred(const QString& message);
 

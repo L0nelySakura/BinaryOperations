@@ -60,6 +60,33 @@ QStringList FileManager::input_files() {
   return files;
 }
 
+QString FileManager::get_output_path_for(const QString& input_file_path,
+                                         const QString& output_directory,
+                                         OutputPathMode path_mode) const {
+  QFileInfo input_info(input_file_path);
+  QString base_name = input_info.fileName();
+  QString out_path = output_directory + QDir::separator() + base_name;
+
+  if (path_mode != OutputPathMode::kAppendCounter) {
+    return out_path;
+  }
+
+  QString name = input_info.completeBaseName();
+  QString suffix = input_info.suffix();
+  const QDir out_dir(output_directory);
+  int counter = 1;
+  while (true) {
+    QString candidate = suffix.isEmpty()
+                           ? QString("%1_%2").arg(name).arg(counter)
+                           : QString("%1_%2.%3").arg(name).arg(counter).arg(suffix);
+    QString candidate_path = out_dir.absoluteFilePath(candidate);
+    if (!QFileInfo::exists(candidate_path)) {
+      return candidate_path;
+    }
+    ++counter;
+  }
+}
+
 bool FileManager::directory_exists(const QString& path) const {
   QFileInfo info(path);
   return info.exists() && info.isDir();
