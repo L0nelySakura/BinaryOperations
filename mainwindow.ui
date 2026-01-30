@@ -64,7 +64,7 @@
          <item row="1" column="0" colspan="2">
           <widget class="QLabel" name="inputPathLabel">
            <property name="text">
-            <string>&lt;Путь к исходной папке&gt;</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -121,7 +121,7 @@
             <enum>Qt::LayoutDirection::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>&lt;Путь к выходной папке&gt;</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -431,14 +431,14 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="statusLabel">
            <property name="text">
             <string>Статус: </string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="statusStatusLabel">
            <property name="text">
             <string>&lt;Статус&gt;</string>
            </property>

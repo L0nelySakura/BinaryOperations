@@ -24,7 +24,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         fileprocessor.h fileprocessor.cpp
-        Settings.cpp
+        settings.h settings.cpp
+        filemanager.h filemanager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET BinaryOperations APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
