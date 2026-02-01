@@ -10,11 +10,12 @@
 class FileManager;
 
 class Worker : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  explicit Worker(FileManager* file_manager, const Settings& settings,
-                  QObject* parent = nullptr);
+public:
+    explicit Worker(FileManager* file_manager,
+                    Settings settings,
+                    QObject* parent = nullptr);
 
   void set_files_to_process(const QStringList& paths);
   void process();
@@ -31,7 +32,7 @@ class Worker : public QObject {
 
  private:
   FileManager* file_manager_;
-  const Settings& settings_;
+  Settings settings_;
   QStringList files_to_process_;
   QAtomicInt cancel_requested_{0};
 };

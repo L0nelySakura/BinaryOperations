@@ -302,7 +302,7 @@
          <enum>QFrame::Shadow::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_5">
-         <item row="2" column="1">
+         <item row="0" column="1">
           <widget class="QSpinBox" name="checkFilesIntervalSpinBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -330,27 +330,10 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="0" column="0">
           <widget class="QLabel" name="checkFilesIntervalLabel">
            <property name="text">
-            <string>Интервал проверки:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QRadioButton" name="periodicCheckFilesRadioButton">
-           <property name="text">
-            <string>Проверять наличие файлов по таймеру</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QRadioButton" name="singleCheckFilesRadioButton">
-           <property name="text">
-            <string>Запуск программы по начальным файлам</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
+            <string>Интервал проверки входных файлов:</string>
            </property>
           </widget>
          </item>
