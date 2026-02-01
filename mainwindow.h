@@ -2,7 +2,9 @@
 
 #include <QMainWindow>
 #include <QScopedPointer>
+#include <QStringList>
 #include <QThread>
+#include <QTimer>
 
 #include "filemanager.h"
 #include "settings.h"
@@ -31,6 +33,11 @@ class MainWindow : public QMainWindow {
  private:
   void connect_ui_to_settings();
   void on_start_stop_clicked();
+  void start_worker_with_list(const QStringList& files);
+  void on_run_timer();
+  void on_scan_timer();
+  void start_timers_if_periodic();
+  void stop_timers();
   void on_worker_finished();
   void on_worker_progress_overall(int percent);
   void on_worker_progress_file(const QString& file_name, int percent);
@@ -43,4 +50,7 @@ class MainWindow : public QMainWindow {
   QScopedPointer<FileManager> file_manager_;
   Worker* worker_ = nullptr;
   QThread* worker_thread_ = nullptr;
+  QStringList pending_files_;
+  QTimer* run_timer_ = nullptr;
+  QTimer* scan_timer_ = nullptr;
 };

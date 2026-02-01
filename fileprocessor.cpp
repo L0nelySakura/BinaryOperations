@@ -18,7 +18,8 @@ bool FileProcessor::process_file(
     const QString& input_path,
     const QString& output_path,
     const QByteArray& xor_key_8_bytes,
-    std::function<void(int percent)> progress_callback) {
+    std::function<void(int percent)> progress_callback,
+    std::function<bool()> is_cancelled) {
     if (xor_key_8_bytes.size() != 8) {
         return false;
     }
@@ -30,6 +31,7 @@ bool FileProcessor::process_file(
 
     QFile out_file(output_path);
     if (!out_file.open(QIODevice::WriteOnly)) {
+        in_file.close();
         return false;
     }
 
@@ -38,8 +40,18 @@ bool FileProcessor::process_file(
     int last_percent = -1;
 
     while (!in_file.atEnd()) {
+        if (is_cancelled && is_cancelled()) {
+          out_file.close();
+          in_file.close();
+          QFile::remove(output_path);
+          return false;
+        }
+
         QByteArray chunk = in_file.read(kChunkSizeBytes);
         if (chunk.isEmpty() && !in_file.atEnd()) {
+            out_file.close();
+            in_file.close();
+            QFile::remove(output_path);
             return false;
         }
         if (chunk.isEmpty()) {
@@ -49,12 +61,16 @@ bool FileProcessor::process_file(
         xor_chunk(chunk, xor_key_8_bytes);
 
         if (out_file.write(chunk) != chunk.size()) {
-            return false;
+          out_file.close();
+          in_file.close();
+          QFile::remove(output_path);
+          return false;
         }
 
         read_total += chunk.size();
         if (progress_callback && total_size > 0) {
             int percent = static_cast<int>((100 * read_total) / total_size);
+            //_sleep(1000);
             if (percent != last_percent) {
                 last_percent = percent;
                 progress_callback(percent);

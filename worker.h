@@ -16,6 +16,7 @@ class Worker : public QObject {
   explicit Worker(FileManager* file_manager, const Settings& settings,
                   QObject* parent = nullptr);
 
+  void set_files_to_process(const QStringList& paths);
   void process();
 
  public slots:
@@ -31,5 +32,6 @@ class Worker : public QObject {
  private:
   FileManager* file_manager_;
   const Settings& settings_;
+  QStringList files_to_process_;
   QAtomicInt cancel_requested_{0};
 };
