@@ -3,7 +3,13 @@
 #include <QDir>
 #include <QFileInfo>
 
-FileManager::FileManager(QObject* parent) : QObject(parent) {}
+
+FileManager::FileManager(QObject* parent)
+    : QObject(parent)
+    , input_directory_("")
+    , output_directory_("")
+    , file_mask_("") {
+}
 
 bool FileManager::SetInputDirectory(const QString& directory_path) {
     if (!DirectoryExists(directory_path)) {
@@ -15,29 +21,31 @@ bool FileManager::SetInputDirectory(const QString& directory_path) {
     return true;
 }
 
-void FileManager::SetOutputDirectory(const QString& directory_path) {
+bool FileManager::SetOutputDirectory(const QString& directory_path) {
     if (!directory_path.isEmpty() && !DirectoryExists(directory_path)) {
         emit ErrorOccurred("Выходная папка не существует: " + directory_path);
         output_directory_.clear();
-        return;
+        return false;
     }
     output_directory_ = directory_path;
+    return true;
 }
 
-void FileManager::SetFileMask(const QString& file_mask) {
+bool FileManager::SetFileMask(const QString& file_mask) {
     if (!MaskIsValid(file_mask)) {
         emit ErrorOccurred("Некорректная маска файлов: " + file_mask);
         file_mask_.clear();
-        return;
+        return false;
     }
     file_mask_ = file_mask;
+    return true;
 }
 
 bool FileManager::IsValid() const {
     return !input_directory_.isEmpty() && !file_mask_.isEmpty();
 }
 
-QStringList FileManager::GetInputFiles() {
+const QStringList FileManager::GetInputFiles() {
     if (!IsValid()) {
         emit ErrorOccurred(
             "Невозможно получить список файлов: параметры не заданы");

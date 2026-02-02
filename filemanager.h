@@ -9,17 +9,18 @@ class FileManager : public QObject {
 
 public:
     explicit FileManager(QObject* parent = nullptr);
+    ~FileManager() override = default;
 
     bool SetInputDirectory(const QString& directory_path);
-    void SetOutputDirectory(const QString& directory_path);
-    void SetFileMask(const QString& file_mask);
+    bool SetOutputDirectory(const QString& directory_path);
+    bool SetFileMask(const QString& file_mask);
 
     const QString& input_directory() const { return input_directory_; }
     const QString& output_directory() const { return output_directory_; }
     const QString& file_mask() const { return file_mask_; }
 
     bool IsValid() const;
-    QStringList GetInputFiles();
+    const QStringList GetInputFiles();
 
     enum class OutputPathMode { kOverwrite, kAppendCounter };
     QString GetOutputPathFor(const QString& input_file_path,
