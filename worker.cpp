@@ -11,42 +11,48 @@ Worker::Worker(FileManager* file_manager,
                Settings settings,
                QObject* parent)
     : QObject(parent),
-      file_manager_(file_manager),
-      settings_(std::move(settings)) {}
+    file_manager_(file_manager),
+    settings_(std::move(settings)) {}
 
-void Worker::request_cancel() {
+Worker::~Worker() {
+    RequestCancel();
+    QCoreApplication::processEvents();
+}
+
+
+void Worker::RequestCancel() {
     cancel_requested_.storeRelaxed(1);
 }
 
-void Worker::set_files_to_process(const QStringList& paths) {
+void Worker::SetFilesToProcess(const QStringList& paths) {
     files_to_process_ = paths;
 }
 
-void Worker::process() {
-    if (!file_manager_->is_valid()) {
-        emit error_occurred("Не заданы входная папка или маска файлов.");
-        emit finished();
+void Worker::Process() {
+    if (!file_manager_->IsValid()) {
+        emit ErrorOccurred("Не заданы входная папка или маска файлов.");
+        emit Finished();
         return;
     }
 
     if (settings_.xor_key_8_bytes().size() != 8) {
-        emit error_occurred("Ключ XOR должен быть ровно 8 байт (16 hex-символов).");
-        emit finished();
+        emit ErrorOccurred("Ключ XOR должен быть ровно 8 байт (16 hex-символов).");
+        emit Finished();
         return;
     }
 
     if (settings_.output_directory().isEmpty()) {
-        emit error_occurred("Не указана выходная папка.");
-        emit finished();
+        emit ErrorOccurred("Не указана выходная папка.");
+        emit Finished();
         return;
     }
 
     QStringList input_paths =
-        files_to_process_.isEmpty() ? file_manager_->input_files()
+        files_to_process_.isEmpty() ? file_manager_->GetInputFiles()
                                     : files_to_process_;
     if (input_paths.isEmpty()) {
-        emit status_message("Нет файлов для обработки.");
-        emit finished();
+        emit StatusMessage("Нет файлов для обработки.");
+        emit Finished();
         return;
     }
 
@@ -61,24 +67,24 @@ void Worker::process() {
     FileProcessor processor;
     int processed = 0;
 
-    for (const QString& input_path : std::as_const(input_paths)) {
+    for (const QString& input_path : input_paths) {
         if (cancel_requested_.loadRelaxed()) {
-            emit status_message(tr("Остановлено пользователем."));
-            emit finished();
+            emit StatusMessage("Остановлено пользователем.");
+            emit Finished();
             return;
         }
 
-        QString output_path = file_manager_->get_output_path_for(
+        QString output_path = file_manager_->GetOutputPathFor(
             input_path, settings_.output_directory(), path_mode);
 
         QFileInfo input_info(input_path);
-        emit status_message(
+        emit StatusMessage(
             tr("Обработка: %1").arg(input_info.fileName()));
 
-        bool ok = processor.process_file(
+        bool ok = processor.ProcessFile(
             input_path, output_path, xor_key,
             [this, &input_info](int percent) {
-                emit progress_file(input_info.fileName(), percent);
+                emit ProgressFile(input_info.fileName(), percent);
             },
             [this]() {
                 QCoreApplication::processEvents();
@@ -86,23 +92,23 @@ void Worker::process() {
             });
         if (!ok) {
             if (cancel_requested_.loadRelaxed()) {
-                emit status_message(tr("Остановлено пользователем."));
+                emit StatusMessage("Остановлено пользователем.");
             } else {
-                emit error_occurred(
+                emit ErrorOccurred(
                     tr("Ошибка обработки файла: %1").arg(input_path));
             }
-            emit finished();
+            emit Finished();
             return;
         }
         ++processed;
-        emit progress_overall(static_cast<int>((100 * processed) / total_files));
+        emit ProgressOverall(static_cast<int>((100 * processed) / total_files));
 
         if (delete_input) {
             QFile::remove(input_path);
         }
     }
 
-    emit status_message(tr("Готово. Обработано файлов: %1").arg(processed));
-    emit progress_overall(100);
-    emit finished();
+    emit StatusMessage(tr("Готово. Обработано файлов: %1").arg(processed));
+    emit ProgressOverall(100);
+    emit Finished();
 }

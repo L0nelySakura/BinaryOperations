@@ -2,7 +2,7 @@
 
 #include <QFile>
 
-void FileProcessor::xor_chunk(QByteArray& chunk, const QByteArray& key) {
+void FileProcessor::XorChunk(QByteArray& chunk, const QByteArray& key) {
     if (key.size() != 8) return;
     const char* k = key.constData();
     const int key_len = 8;
@@ -14,7 +14,7 @@ void FileProcessor::xor_chunk(QByteArray& chunk, const QByteArray& key) {
     }
 }
 
-bool FileProcessor::process_file(
+bool FileProcessor::ProcessFile(
     const QString& input_path,
     const QString& output_path,
     const QByteArray& xor_key_8_bytes,
@@ -41,10 +41,10 @@ bool FileProcessor::process_file(
 
     while (!in_file.atEnd()) {
         if (is_cancelled && is_cancelled()) {
-          out_file.close();
-          in_file.close();
-          QFile::remove(output_path);
-          return false;
+            out_file.close();
+            in_file.close();
+            QFile::remove(output_path);
+            return false;
         }
 
         QByteArray chunk = in_file.read(kChunkSizeBytes);
@@ -58,19 +58,18 @@ bool FileProcessor::process_file(
             break;
         }
 
-        xor_chunk(chunk, xor_key_8_bytes);
+        XorChunk(chunk, xor_key_8_bytes);
 
         if (out_file.write(chunk) != chunk.size()) {
-          out_file.close();
-          in_file.close();
-          QFile::remove(output_path);
-          return false;
+            out_file.close();
+            in_file.close();
+            QFile::remove(output_path);
+            return false;
         }
 
         read_total += chunk.size();
         if (progress_callback && total_size > 0) {
             int percent = static_cast<int>((100 * read_total) / total_size);
-            //_sleep(1000);
             if (percent != last_percent) {
                 last_percent = percent;
                 progress_callback(percent);

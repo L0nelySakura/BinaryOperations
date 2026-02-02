@@ -149,7 +149,7 @@
          <item row="0" column="1">
           <widget class="QLineEdit" name="inputMaskEdit">
            <property name="text">
-            <string>*.txt</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -170,7 +170,7 @@
          <item row="1" column="1">
           <widget class="QLineEdit" name="inputKeyEdit">
            <property name="text">
-            <string>1234123412341234</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -275,6 +275,9 @@
            <property name="maximum">
             <number>3600</number>
            </property>
+           <property name="value">
+            <number>30</number>
+           </property>
           </widget>
          </item>
          <item row="2" column="0">
@@ -327,6 +330,9 @@
            </property>
            <property name="maximum">
             <number>3600</number>
+           </property>
+           <property name="value">
+            <number>10</number>
            </property>
           </widget>
          </item>
@@ -431,7 +437,7 @@
          <item>
           <widget class="QLabel" name="statusStatusLabel">
            <property name="text">
-            <string>&lt;Статус&gt;</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -460,7 +466,7 @@
          <item>
           <widget class="QProgressBar" name="overallProgressBar">
            <property name="value">
-            <number>24</number>
+            <number>0</number>
            </property>
           </widget>
          </item>
@@ -486,7 +492,7 @@
          <item row="0" column="1">
           <widget class="QLabel" name="currentFileStatusLabel">
            <property name="text">
-            <string>&lt;Текущий файл&gt;</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -496,7 +502,7 @@
          <item row="1" column="0" colspan="2">
           <widget class="QProgressBar" name="currentFileProgressBar">
            <property name="value">
-            <number>24</number>
+            <number>0</number>
            </property>
           </widget>
          </item>
@@ -516,16 +522,6 @@
      </layout>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>986</width>
-     <height>21</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

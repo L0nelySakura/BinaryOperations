@@ -5,35 +5,35 @@
 #include <QStringList>
 
 class FileManager : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  explicit FileManager(QObject* parent = nullptr);
+public:
+    explicit FileManager(QObject* parent = nullptr);
 
-  bool set_input_directory(const QString& directory_path);
-  void set_output_directory(const QString& directory_path);
-  void set_file_mask(const QString& file_mask);
+    bool SetInputDirectory(const QString& directory_path);
+    void SetOutputDirectory(const QString& directory_path);
+    void SetFileMask(const QString& file_mask);
 
-  const QString& input_directory() const { return input_directory_; }
-  const QString& output_directory() const { return output_directory_; }
-  const QString& file_mask() const { return file_mask_; }
+    const QString& input_directory() const { return input_directory_; }
+    const QString& output_directory() const { return output_directory_; }
+    const QString& file_mask() const { return file_mask_; }
 
-  bool is_valid() const;
-  QStringList input_files();
+    bool IsValid() const;
+    QStringList GetInputFiles();
 
-  enum class OutputPathMode { kOverwrite, kAppendCounter };
-  QString get_output_path_for(const QString& input_file_path,
-                              const QString& output_directory,
-                              OutputPathMode path_mode) const;
+    enum class OutputPathMode { kOverwrite, kAppendCounter };
+    QString GetOutputPathFor(const QString& input_file_path,
+                             const QString& output_directory,
+                             OutputPathMode path_mode) const;
 
- signals:
-  void error_occurred(const QString& message);
+signals:
+    void ErrorOccurred(const QString& message);
 
- private:
-  bool directory_exists(const QString& path) const;
-  bool mask_is_valid(const QString& mask) const;
+private:
+    bool DirectoryExists(const QString& path) const;
+    bool MaskIsValid(const QString& mask) const;
 
-  QString input_directory_;
-  QString output_directory_;
-  QString file_mask_;
+    QString input_directory_;
+    QString output_directory_;
+    QString file_mask_;
 };
