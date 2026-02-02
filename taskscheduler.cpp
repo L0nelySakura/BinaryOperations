@@ -266,7 +266,7 @@ void TaskScheduler::OnWorkerFinished() {
     }
 
     if (settings_.run_mode() == Settings::RunMode::kPeriodic && is_active_) {
-        emit StatusMessage("Обработка завершена. Ожидание следующего цикла...");
+        emit StatusMessage("Ожидание следующего цикла...");
     } else if (settings_.run_mode() == Settings::RunMode::kSingle) {
         is_active_ = false;
         emit SchedulerStopped();
